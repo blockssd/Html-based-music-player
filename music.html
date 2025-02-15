@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件夹音乐播放器</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* 更换字体 */
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f9f9f9; /* 更改背景颜色 */
+            background-image: url('image/temp.jpg'); /* 添加背景图片 */
+            background-size: cover; /* 使背景图片覆盖整个页面 */
+            background-position: center; /* 确保背景图片居中显示 */
+            background-repeat: no-repeat; /* 防止背景图片重复 */
+            background-attachment: scroll; /* 允许背景图片滚动 */
+            transition: background-position 0.3s ease; /* 添加过渡效果 */
+        }
+
+        .player-container {
+            background-color: rgba(255, 255, 255, 0.7); /* 更改背景颜色为半透明白色 */
+            padding: 20px;
+            border-radius: 15px; /* 更改边框半径 */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* 更改阴影效果 */
+            transition: width 2s ease, height 2s ease, padding 0.5s ease, box-shadow 0.5s ease; /* 修改过渡效果时间 */
+            overflow: hidden; /* 添加溢出隐藏 */
+            height: auto; /* 添加自动高度 */
+            margin-top: 100px; /* 添加向下偏移100px */
+        }
+
+        .player-container.collapsed {
+            height: 70px; /* 折叠时的高度 */
+            padding: 0px 10px 10px 10px; /* 折叠时的内边距 */
+            transition: width 2s ease, height 2s ease, padding 0.5s ease; /* 添加过渡效果 */
+        }
+
+        #playlist {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0; /* 更改边框颜色 */
+            margin: 15px 0;
+            padding: 15px; /* 增加内边距 */
+            border-radius: 10px; /* 添加边框半径 */
+            background-color: #ffffff; /* 更改背景颜色 */
+        }
+
+        .playlist-item {
+            padding: 15px; /* 增加内边距 */
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0; /* 更改边框颜色 */
+            margin-bottom: 10px; /* 增加间距 */
+            transition: background-color 0.3s; /* 添加过渡效果 */
+            border-radius: 8px; /* 添加边框半径 */
+        }
+
+        .playlist-item:hover {
+            background-color: #e0f7fa; /* 更改悬停背景颜色 */
+        }
+
+        .current-song {
+            background-color: #bbdefb !important; /* 更改当前歌曲背景颜色 */
+            font-weight: bold;
+            border-left: 5px solid #6200ea; /* 增加高亮效果 */
+            padding-left: 20px; /* 增加内边距 */
+            border-radius: 8px; /* 添加边框半径 */
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center; /* 居中对齐控件 */
+            gap: 15px; /* 增加间距 */
+            align-items: center;
+            margin-top: 20px; /* 增加上边距 */
+        }
+
+        button {
+            padding: 10px 20px; /* 增加内边距 */
+            background-color: #6200ea; /* 更改背景颜色为紫色 */
+            color: white;
+            border: none;
+            border-radius: 5px; /* 更改边框半径 */
+            cursor: pointer;
+            transition: background-color 0.3s, transform 1s; /* 添加过渡效果和变换效果 */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* 添加阴影效果 */
+        }
+
+        button:hover {
+            background-color: #3700b3; /* 更改悬停背景颜色为深紫色 */
+            transform: scale(1.05); /* 添加悬停时的放大效果 */
+        }
+
+        #currentSong {
+            margin: 15px 0; /* 增加上下边距 */
+            font-size: 1.3em; /* 增加字体大小 */
+            color: #333333; /* 更改字体颜色 */
+            text-align: center; /* 居中文本 */
+        }
+        /* 添加以下CSS样式 */
+        #audioPlayer {
+            width: 100%;
+            margin-top: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* WebKit浏览器样式定制 */
+        #audioPlayer::-webkit-media-controls-panel {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 8px 8px 0 0;
+        }
+
+        #audioPlayer::-webkit-media-controls-play-button {
+            background-color: #6200ea; /* 更改背景颜色为紫色 */
+            border-radius: 50%;
+        }
+
+        #audioPlayer::-webkit-media-controls-timeline {
+            background-color: #b2ebf2;
+            border-radius: 4px;
+            margin: 0 10px;
+        }
+
+        #audioPlayer::-webkit-media-controls-current-time-display,
+        #audioPlayer::-webkit-media-controls-time-remaining-display {
+            color: #333;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        /* 进度条滑块颜色 */
+        #audioPlayer::-webkit-media-controls-timeline::-webkit-slider-thumb {
+            background: #6200ea; /* 更改背景颜色为紫色 */
+        }
+
+        /* 音量条统一风格 */
+        #audioPlayer::-webkit-media-controls-volume-slider {
+            background-color: #b2ebf2;
+            border-radius: 4px;
+        }
+
+        #audioPlayer::-webkit-media-controls-volume-slider::-webkit-slider-thumb {
+            background: #6200ea; /* 更改背景颜色为紫色 */
+        }
+
+        /* Firefox浏览器样式适配 */
+        #audioPlayer::-moz-range-progress {
+            background-color: #6200ea; /* 更改背景颜色为紫色 */
+        }
+
+        #audioPlayer::-moz-range-thumb {
+            background: #6200ea; /* 更改背景颜色为紫色 */
+        }
+
+        /* 美化文件选择按钮 */
+        #folderInput {
+            display: none; /* 隐藏默认文件选择按钮 */
+        }
+
+        .custom-file-upload {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #6200ea; /* 更改背景颜色为紫色 */
+            color: white;
+            border: none;
+            border-radius: 5px; /* 更改边框半径 */
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s; /* 添加过渡效果和变换效果 */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* 添加阴影效果 */
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .custom-file-upload:hover {
+            background-color: #3700b3; /* 更改悬停背景颜色为深紫色 */
+            transform: scale(1.05); /* 添加悬停时的放大效果 */
+        }
+
+        .custom-file-upload::before {
+            content: '\1F4C1'; /* 文件夹图标 */
+            font-size: 20px;
+            margin-right: 5px;
+        }
+
+        /* 搜索框样式 */
+        #searchInput {
+            padding: 10px 20px; /* 修改: 增加水平内边距以匹配按钮 */
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            width: calc(100% - 42px); /* 修改: 调整宽度以适应新的内边距 */
+            font-size: 16px;
+            transition: border-color 0.3s;
+            height: 40px; /* 修改: 设置固定高度以匹配按钮 */
+            margin-top: 15px; /* 设置margin上方为15px */
+        }
+
+        #searchInput:focus {
+            border-color: #6200ea;
+            outline: none;
+        }
+
+        /* 搜索按钮样式 */
+        #searchBtn {
+            padding: 10px 20px; /* 保持不变 */
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            background-color: #6200ea; /* 更改背景颜色为紫色 */
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s; /* 添加过渡效果和变换效果 */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* 添加阴影效果 */
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 16px;
+        }
+
+        #searchBtn:hover {
+            background-color: #3700b3; /* 更改悬停背景颜色为深紫色 */
+            transform: scale(1.05); /* 添加悬停时的放大效果 */
+        }
+    </style>
+</head>
+
+
+<body>
+    <div style="position: absolute; top: 10px; left: 50px;">
+        <h1>音乐播放器</h1>
+    </div>
+    <div id="currentSong"></div>
+</header>
+<div class="player-container">
+
+    <audio id="audioPlayer" controls></audio>
+
+    <hr>
+
+    <label for="folderInput" class="custom-file-upload">
+        选择文件夹
+    </label>
+    <input type="file" id="folderInput" webkitdirectory directory multiple>
+    <div style="display: flex; align-items: center;">
+        <input type="text" id="searchInput" placeholder="搜索歌曲..." onkeyup="filterPlaylist()">
+        <!-- 添加搜索按钮 -->
+        <button id="searchBtn">搜索</button>
+    </div>
+
+    <div id="playlist"></div>
+
+    <div class="controls">
+        <button id="prevBtn">上一首</button>
+        <button id="playPauseBtn">播放</button>
+        <button id="nextBtn">下一首</button>
+        <!-- 添加定位按钮 -->
+        <button id="locateBtn">定位</button>
+    </div>
+
+</div>
+
+<script>
+    const audioPlayer = document.getElementById('audioPlayer');
+    const folderInput = document.getElementById('folderInput');
+    const playlist = document.getElementById('playlist');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const currentSongDisplay = document.getElementById('currentSong');
+    const searchInput = document.getElementById('searchInput');
+    const locateBtn = document.getElementById('locateBtn');
+    const searchBtn = document.getElementById('searchBtn');
+    const changeBackgroundBtn = document.getElementById('changeBackgroundBtn');
+
+    let musicFiles = [];
+    let currentTrackIndex = -1;
+    let backgroundImages = ['image/temp.jpg', 'image/temp1.jpg']; // 添加背景图片数组
+    let currentBackgroundIndex = 0;
+
+    // 处理文件夹选择
+    folderInput.addEventListener('change', async (e) => {
+        const files = Array.from(e.target.files);
+        // 过滤音频文件
+        musicFiles = files.filter(file => file.type.startsWith('audio/'));
+        if(musicFiles.length === 0) {
+            alert('未找到音频文件');
+            return;
+        }
+
+        // 生成播放列表
+        renderPlaylist();
+    });
+
+    // 渲染播放列表
+    function renderPlaylist(filteredFiles = musicFiles) {
+        playlist.innerHTML = filteredFiles
+            .map((file, index) => `
+                <div class="playlist-item ${index === currentTrackIndex ? 'current-song' : ''}"
+                     data-index="${musicFiles.indexOf(file)}"
+                     onclick="playTrack(${musicFiles.indexOf(file)})">
+                    ${file.name}
+                </div>
+            `)
+            .join('');
+    }
+
+    // 加载并播放指定曲目
+    function loadTrack(index) {
+        if(index < 0 || index >= musicFiles.length) return;
+
+        const file = musicFiles[index];
+        const url = URL.createObjectURL(file);
+        audioPlayer.src = url;
+        audioPlayer.play();
+        currentSongDisplay.textContent = `当前播放：${file.name}`;
+        currentTrackIndex = index;
+        renderPlaylist();
+    }
+
+    // 修改: playTrack 函数，使其根据原列表中的索引进行播放
+    window.playTrack = function(index) {
+        loadTrack(index);
+    }
+
+    // 播放/暂停控制
+    playPauseBtn.addEventListener('click', () => {
+        if(audioPlayer.paused) {
+            audioPlayer.play();
+            playPauseBtn.textContent = '暂停';
+        } else {
+            audioPlayer.pause();
+            playPauseBtn.textContent = '播放';
+        }
+    });
+
+    // 下一首
+    nextBtn.addEventListener('click', () => {
+        const nextIndex = (currentTrackIndex + 1) % musicFiles.length;
+        loadTrack(nextIndex);
+    });
+
+    // 上一首
+    prevBtn.addEventListener('click', () => {
+        const prevIndex = (currentTrackIndex - 1 + musicFiles.length) % musicFiles.length;
+        loadTrack(prevIndex);
+    });
+
+    // 自动播放下一首
+    audioPlayer.addEventListener('ended', () => {
+        nextBtn.click();
+    });
+
+    playPauseBtn.textContent = '播放'; // 确保播放按钮初始状态为“播放”
+
+    // 新增: 实现 filterPlaylist 函数
+    function filterPlaylist() {
+        const query = searchInput.value.toLowerCase();
+        const filteredFiles = musicFiles.filter(file => file.name.toLowerCase().includes(query));
+        renderPlaylist(filteredFiles);
+    }
+
+    // 新增: 添加搜索按钮点击事件监听器
+    searchBtn.addEventListener('click', () => {
+        filterPlaylist();
+    });
+
+    // 新增: 实现定位按钮功能
+    locateBtn.addEventListener('click', () => {
+        if (currentTrackIndex !== -1) {
+            const currentSongElement = document.querySelector(`.playlist-item[data-index="${currentTrackIndex}"]`);
+            if (currentSongElement) {
+                currentSongElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    });
+
+    // 重新添加折叠效果的JavaScript代码
+    const playerContainer = document.querySelector('.player-container');
+    playerContainer.addEventListener('mouseenter', () => playerContainer.classList.remove('collapsed'));
+    playerContainer.addEventListener('mouseleave', () => playerContainer.classList.add('collapsed'));
+
+    // 新增: 添加鼠标移动事件监听器以实现背景图片滑动效果
+    document.addEventListener('mousemove', (e) => {
+        const x = e.clientX;
+        const y = e.clientY;
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        const offsetX = (x / width) * 50 - 25; // 调整背景图片水平偏移量
+        const offsetY = (y / height) * 50 - 38; // 调整背景图片垂直偏移量
+
+        document.body.style.backgroundPosition = `${50 + offsetX}% ${50 + offsetY}%`;
+    });
+
+    // 新增: 添加背景图片切换功能
+    changeBackgroundBtn.addEventListener('click', () => {
+        currentBackgroundIndex = (currentBackgroundIndex + 1) % backgroundImages.length;
+        document.body.style.backgroundImage = `url('${backgroundImages[currentBackgroundIndex]}')`;
+    });
+</script>
+</body>
+</html>
