@@ -1,0 +1,209 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    background-image: url('image/temp.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: scroll;
+    transition: background-position 0.3s ease;
+}
+
+.player-container {
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: width 2s ease, height 2s ease, padding 0.5s ease, box-shadow 0.5s ease;
+    overflow: hidden;
+    height: auto;
+    margin-top: 100px;
+}
+
+.player-container.collapsed {
+    height: 70px;
+    padding: 0px 10px 10px 10px;
+    transition: width 2s ease, height 2s ease, padding 0.5s ease;
+}
+
+#playlist {
+    height: 300px;
+    overflow-y: auto;
+    border: 1px solid #e0e0e0;
+    margin: 15px 0;
+    padding: 15px;
+    border-radius: 10px;
+    background-color: #ffffff;
+}
+
+.playlist-item {
+    padding: 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 10px;
+    transition: background-color 0.3s;
+    border-radius: 8px;
+}
+
+.playlist-item:hover {
+    background-color: #e0f7fa;
+}
+
+.current-song {
+    background-color: #bbdefb !important;
+    font-weight: bold;
+    border-left: 5px solid #6200ea;
+    padding-left: 20px;
+    border-radius: 8px;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    align-items: center;
+    margin-top: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #6200ea;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 1s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+button:hover {
+    background-color: #3700b3;
+    transform: scale(1.05);
+}
+
+#currentSong {
+    margin: 15px 0;
+    font-size: 1.3em;
+    color: #333333;
+    text-align: center;
+}
+
+#audioPlayer {
+    width: 100%;
+    margin-top: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+#audioPlayer::-webkit-media-controls-panel {
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 8px 8px 0 0;
+}
+
+#audioPlayer::-webkit-media-controls-play-button {
+    background-color: #6200ea;
+    border-radius: 50%;
+}
+
+#audioPlayer::-webkit-media-controls-timeline {
+    background-color: #b2ebf2;
+    border-radius: 4px;
+    margin: 0 10px;
+}
+
+#audioPlayer::-webkit-media-controls-current-time-display,
+#audioPlayer::-webkit-media-controls-time-remaining-display {
+    color: #333;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+#audioPlayer::-webkit-media-controls-timeline::-webkit-slider-thumb {
+    background: #6200ea;
+}
+
+#audioPlayer::-webkit-media-controls-volume-slider {
+    background-color: #b2ebf2;
+    border-radius: 4px;
+}
+
+#audioPlayer::-webkit-media-controls-volume-slider::-webkit-slider-thumb {
+    background: #6200ea;
+}
+
+#audioPlayer::-moz-range-progress {
+    background-color: #6200ea;
+}
+
+#audioPlayer::-moz-range-thumb {
+    background: #6200ea;
+}
+
+#folderInput {
+    display: none;
+}
+
+.custom-file-upload {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #6200ea;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.custom-file-upload:hover {
+    background-color: #3700b3;
+    transform: scale(1.05);
+}
+
+.custom-file-upload::before {
+    content: '\1F4C1';
+    font-size: 20px;
+    margin-right: 5px;
+}
+
+#searchInput {
+    padding: 10px 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    width: calc(100% - 42px);
+    font-size: 16px;
+    transition: border-color 0.3s;
+    height: 40px;
+    margin-top: 15px;
+}
+
+#searchInput:focus {
+    border-color: #6200ea;
+    outline: none;
+}
+
+#searchBtn {
+    padding: 10px 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    background-color: #6200ea;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 16px;
+}
+
+#searchBtn:hover {
+    background-color: #3700b3;
+    transform: scale(1.05);
+}
